@@ -1,0 +1,52 @@
+.data
+    test_cases: .word 7, 13, -1    # Test cases
+    results:    .word 0, 0, 0     # Array to store results
+
+    newline:    .asciiz "\n"
+
+.text
+    .align 2
+    .globl main
+
+main:
+    la a0, test_cases     # Load address of test_cases array
+    la a1, results        # Load address of results array
+
+    li a2, 3              # Loop counter for three test cases
+
+test_loop:
+    lw a3, 0(a0)          # Load current test case value into a3
+    jal square            # Call the square function
+    sw a0, 0(a1)          # Store the result in the results array
+
+    li a0, 1              # Print integer system call code
+    mv a1, a3             # Load the original test case value into a1
+    ecall
+
+    la a0, newline
+    li a1, 1              # Print string system call code
+    ecall
+
+    addi a0, a0, 4        # Move to the next test case in the array
+    addi a1, a1, 4        # Move to the next result in the array
+    addi a2, a2, -1       # Decrement the loop counter
+    bnez a2, test_loop    # Repeat the loop if the counter is not zero
+
+    # Exit
+    li a0, 10             # Exit system call code
+    ecall
+
+square:
+    # Input: a3 - n
+    # Output: a0 - result
+
+    bgez a3, is_positive  # Branch to is_positive if n >= 0
+    li a0, 0              # If n < 0, return 0
+    ret
+
+is_positive:
+    mul a0, a3, a3        # Square n
+    ret
+
+ret:
+    jr ra                 # Return from function
